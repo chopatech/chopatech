@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChopaTech AI Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<!-- Optional Apple devices -->
+<link rel="apple-touch-icon" href="/favicon.png">
+
+<link rel="icon" href="https://chopatech.com/favicon.png">
+<meta property="og:image" content="https://chopatech.com/favicon.png">
+</head>
+<body class="bg-[#06111f] text-white min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-72 bg-white/5 border-r border-white/10 p-6 flex flex-col gap-6">
+  <h1 class="text-2xl font-bold">
+    <span class="text-emerald-400">ChopaTech</span> Studio
+  </h1>
+
+  <nav class="flex flex-col gap-3 mt-6">
+    <a href="#" class="p-3 rounded-xl bg-white/10 hover:bg-white/20">🏠 Dashboard</a>
+    <a href="chopatech.ai.html" class="p-3 rounded-xl hover:bg-white/10">🤖 AI Chat</a>
+    <a href="voiceover.html" class="p-3 rounded-xl hover:bg-white/10">🎤 Voice Over</a>
+    <a href="imagegenerator.html" class="p-3 rounded-xl hover:bg-white/10">🎨 Image Generator</a>
+  </nav>
+
+  <div class="mt-auto text-xs text-gray-400">
+    Powered by ChopaTech AI
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 p-8">
+
+  <!-- Top bar -->
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold">AI Studio Dashboard</h2>
+    <button class="bg-emerald-500 hover:bg-emerald-400 px-5 py-2 rounded-xl font-semibold">
+      Upgrade
+    </button>
+  </div>
+
+  <!-- Cards -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <div onclick="window.location.href='chopatech.ai.html'"
+      class="cursor-pointer bg-white/10 hover:bg-white/20 p-6 rounded-2xl transition border border-white/10">
+      <h3 class="text-xl font-bold mb-2">🤖 AI Chat</h3>
+      <p class="text-gray-400 text-sm">Talk with ChopaTech AI instantly</p>
+    </div>
+
+    <div onclick="window.location.href='voiceover.html'"
+      class="cursor-pointer bg-white/10 hover:bg-white/20 p-6 rounded-2xl transition border border-white/10">
+      <h3 class="text-xl font-bold mb-2">🎤 Voice Over</h3>
+      <p class="text-gray-400 text-sm">Generate AI voice for videos & ads</p>
+    </div>
+
+    <div onclick="window.location.href='imagegenerator.html'"
+      class="cursor-pointer bg-white/10 hover:bg-white/20 p-6 rounded-2xl transition border border-white/10">
+      <h3 class="text-xl font-bold mb-2">🎨 Image Generator</h3>
+      <p class="text-gray-400 text-sm">Create AI images from prompts</p>
+    </div>
+
+  </div>
+
+  <!-- Activity Section -->
+  <div class="mt-10 bg-white/5 border border-white/10 p-6 rounded-2xl">
+    <h3 class="text-xl font-bold mb-4">Recent Activity</h3>
+
+    <div class="space-y-3 text-sm text-gray-300">
+      <p>✔ AI Chat launched successfully</p>
+      <p>✔ Voice Over module ready</p>
+      <p>✔ Image Generator connected</p>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
