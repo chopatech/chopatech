@@ -2,21 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-  <title>ChopaTech AI Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ChopaTech AI</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    body{
-      background: linear-gradient(
-        to bottom right,
-        #06111f,
-        #0b1729
-      );
+    :root{
+      color-scheme: dark;
+    }
+
+    *{
+      box-sizing: border-box;
+    }
+
+    html, body{
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom right, #06111f, #0b1729);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     ::-webkit-scrollbar{
@@ -30,7 +36,7 @@
 
     @media (max-width: 768px){
       #chatBox{
-        padding: 20px;
+        padding: 16px;
       }
 
       textarea{
@@ -42,18 +48,24 @@
 
 <body class="text-white overflow-hidden">
 
-<div class="flex h-screen">
+<div class="flex h-[100dvh]">
 
   <!-- SIDEBAR -->
   <aside
     id="sidebar"
-    class="fixed lg:relative z-50 lg:z-auto w-72 h-full bg-black/30 border-r border-white/10 p-6 backdrop-blur-xl flex flex-col transition-all duration-300 -translate-x-full lg:translate-x-0">
+    class="fixed lg:relative z-50 lg:z-auto w-72 h-full bg-black/30 border-r border-white/10 p-6 backdrop-blur-xl flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
 
-    <h1 class="text-3xl font-black mb-10">
-      🤖
-      <span class="text-emerald-400">ChopaTech</span>
-      AI
-    </h1>
+    <div class="flex items-center justify-between mb-10">
+      <h1 class="text-3xl font-black">
+        🤖 <span class="text-emerald-400">ChopaTech</span> AI
+      </h1>
+
+      <button
+        onclick="toggleSidebar()"
+        class="lg:hidden bg-white/10 hover:bg-white/20 w-10 h-10 rounded-xl transition text-xl flex items-center justify-center">
+        ✕
+      </button>
+    </div>
 
     <nav class="space-y-4 text-sm">
 
@@ -87,37 +99,42 @@
     </nav>
 
     <div class="mt-auto bg-white/5 border border-white/10 rounded-3xl p-5">
-      <p class="text-gray-400 text-xs">Workers AI Status</p>
-      <h2 class="text-2xl font-bold text-emerald-400 mt-2">Online</h2>
+      <p class="text-gray-400 text-xs">
+        AI Status
+      </p>
+      <h2 class="text-2xl font-bold text-emerald-400 mt-2">
+        Online
+      </h2>
     </div>
 
   </aside>
 
   <!-- MAIN -->
-  <main class="flex-1 flex flex-col">
+  <main class="flex-1 flex flex-col min-w-0">
 
     <!-- HEADER -->
-    <header class="border-b border-white/10 p-5 bg-black/20 backdrop-blur-xl flex justify-between items-center gap-4">
+    <header class="border-b border-white/10 p-4 md:p-5 bg-black/20 backdrop-blur-xl flex justify-between items-center gap-4">
 
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 min-w-0">
         <button
           onclick="toggleSidebar()"
-          class="lg:hidden bg-white/10 hover:bg-white/20 p-3 rounded-xl transition text-xl">
+          class="lg:hidden bg-white/10 hover:bg-white/20 w-11 h-11 rounded-xl transition text-xl flex items-center justify-center shrink-0">
           ☰
         </button>
 
-        <div>
-          <h2 class="text-2xl font-bold">ChopaTech AI Assistant</h2>
-          <p class="text-gray-400 text-sm mt-1">
-            AI powered by Cloudflare Workers AI
+        <div class="min-w-0">
+          <h2 class="text-xl md:text-2xl font-bold truncate">
+            ChopaTech AI
+          </h2>
+          <p class="text-gray-400 text-xs md:text-sm mt-1 truncate">
+            AI powered by ChopaTech
           </p>
         </div>
       </div>
 
       <button
-        onclick="startVoice()"
-        class="bg-emerald-500 hover:bg-emerald-400 px-5 py-3 rounded-2xl font-bold transition">
-        🎙 Talk
+        class="bg-emerald-500 hover:bg-emerald-400 px-4 md:px-5 py-2 md:py-3 rounded-2xl font-bold transition shrink-0">
+        Login
       </button>
 
     </header>
@@ -125,10 +142,10 @@
     <!-- CHAT -->
     <div
       id="chatBox"
-      class="flex-1 overflow-y-auto p-8 space-y-6">
+      class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
 
       <div class="flex">
-        <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[70%]">
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[85%] md:max-w-[70%]">
           👋 Welcome to ChopaTech AI
           <br><br>
           🚀 Ask anything
@@ -144,21 +161,21 @@
     </div>
 
     <!-- UPLOAD PREVIEW -->
-    <div id="uploadPreview" class="px-8 py-2 hidden">
+    <div id="uploadPreview" class="px-4 md:px-8 py-2 hidden">
       <div class="bg-white/10 border border-white/10 rounded-2xl p-4 flex justify-between items-center">
-        <span id="fileName">file.pdf</span>
-        <button onclick="removeUpload()" class="text-red-400 text-xl">✖</button>
+        <span id="fileName" class="truncate pr-3">file.pdf</span>
+        <button onclick="removeUpload()" class="text-red-400 text-xl shrink-0">✖</button>
       </div>
     </div>
 
     <!-- INPUT AREA -->
-    <div class="border-t border-white/10 p-5 bg-black/20 backdrop-blur-xl">
+    <div class="border-t border-white/10 p-3 md:p-5 bg-black/20 backdrop-blur-xl pb-[calc(12px+env(safe-area-inset-bottom))]">
 
       <!-- MODEL + LANGUAGE -->
       <div class="flex gap-2 mb-3">
         <select
           id="modelSelect"
-          class="flex-1 px-3 py-2 rounded-xl bg-[#111827] border border-white/10 text-xs text-white outline-none">
+          class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-[#111827] border border-white/10 text-[11px] md:text-xs text-white outline-none">
 
           <option value="@cf/meta/llama-3.1-8b-instruct">Llama 3.1</option>
           <option value="@cf/meta/llama-3-8b-instruct">Llama 3 8B</option>
@@ -171,7 +188,7 @@
 
         <select
           id="languageSelect"
-          class="flex-1 px-3 py-2 rounded-xl bg-[#111827] border border-white/10 text-xs text-white outline-none">
+          class="flex-1 min-w-0 px-3 py-2 rounded-xl bg-[#111827] border border-white/10 text-[11px] md:text-xs text-white outline-none">
 
           <option value="auto">Auto Detect</option>
           <option value="english">English Only</option>
@@ -181,40 +198,45 @@
       </div>
 
       <!-- INPUT ROW -->
-      <div class="flex gap-3 items-end">
+      <div class="flex gap-2 md:gap-3 items-end">
 
-        <!-- ADD BUTTON -->
-        <label
-          class="shrink-0 bg-white/10 hover:bg-white/20 p-4 rounded-2xl cursor-pointer transition flex items-center justify-center text-xl">
-          ➕
+        <!-- INPUT WRAPPER -->
+        <div class="relative flex-1 min-w-0">
 
-          <input
-            type="file"
-            hidden
-            onchange="uploadFile(event)"
-          />
-        </label>
+          <!-- ADD BUTTON INSIDE MESSAGE BOX (LEFT) -->
+          <label
+            class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-xl cursor-pointer transition flex items-center justify-center text-lg z-10">
+            ➕
 
-        <!-- TEXTAREA -->
-        <textarea
-          id="messageInput"
-          rows="1"
-          placeholder="Message ChopaTech AI..."
-          class="flex-1 p-4 rounded-2xl bg-white/10 border border-white/10 outline-none resize-none"></textarea>
+            <input
+              type="file"
+              hidden
+              onchange="uploadFile(event)"
+            />
+          </label>
 
-        <!-- VOICE -->
-        <button
-          onclick="startVoice()"
-          class="bg-white/10 hover:bg-white/20 p-4 rounded-2xl transition text-2xl">
-          🎤
-        </button>
+          <!-- TEXTAREA -->
+          <textarea
+            id="messageInput"
+            rows="1"
+            placeholder="Message ChopaTech AI..."
+            class="w-full min-h-[52px] max-h-40 pl-14 pr-24 py-4 rounded-2xl bg-white/10 border border-white/10 outline-none resize-none overflow-y-auto"></textarea>
 
-        <!-- SEND -->
-        <button
-          onclick="sendMessage()"
-          class="bg-emerald-500 hover:bg-emerald-400 px-8 py-4 rounded-2xl font-bold transition">
-          Send
-        </button>
+          <!-- MIC INSIDE INPUT -->
+          <button
+            onclick="startVoice()"
+            class="absolute right-14 md:right-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-xl transition text-lg flex items-center justify-center">
+            🎤
+          </button>
+
+          <!-- SEND INSIDE INPUT -->
+          <button
+            onclick="sendMessage()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-500 hover:bg-emerald-400 px-3 md:px-4 h-9 md:h-10 rounded-xl font-bold transition text-sm">
+            Send
+          </button>
+
+        </div>
 
       </div>
 
@@ -236,7 +258,7 @@ function toggleSidebar(){
 function newChat(){
   document.getElementById('chatBox').innerHTML = `
     <div class="flex">
-      <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[70%]">
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[85%] md:max-w-[70%]">
         👋 Karibu ChopaTech AI
         <br><br>
         🚀 Uliza chochote
@@ -264,7 +286,7 @@ async function sendMessage(){
   const user = document.createElement('div');
   user.className = 'flex justify-end';
   user.innerHTML = `
-    <div class="bg-emerald-500 text-black rounded-3xl p-5 max-w-[70%]">
+    <div class="bg-emerald-500 text-black rounded-3xl p-5 max-w-[85%] md:max-w-[70%] break-words">
       ${text}
     </div>
   `;
@@ -275,7 +297,7 @@ async function sendMessage(){
   const loading = document.createElement('div');
   loading.className = 'flex';
   loading.innerHTML = `
-    <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[70%] animate-pulse">
+    <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[85%] md:max-w-[70%] animate-pulse">
       🤖 ChopaTech AI inaandika...
     </div>
   `;
@@ -312,7 +334,7 @@ async function sendMessage(){
     const ai = document.createElement('div');
     ai.className = 'flex';
     ai.innerHTML = `
-      <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[70%]">
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-5 max-w-[85%] md:max-w-[70%] break-words">
         <div class="typing"></div>
       </div>
     `;
@@ -349,7 +371,7 @@ async function sendMessage(){
     if(matched){
       const image = document.createElement('img');
       image.src = `https://source.unsplash.com/900x500/?${matched}`;
-      image.className = "rounded-3xl mt-4 border border-white/10";
+      image.className = "rounded-3xl mt-4 border border-white/10 w-full";
       ai.querySelector('.bg-white\\/10').appendChild(image);
     }
 
@@ -364,7 +386,7 @@ async function sendMessage(){
     const err = document.createElement('div');
     err.className = 'flex';
     err.innerHTML = `
-      <div class="bg-red-500/20 border border-red-500 rounded-3xl p-5 max-w-[70%]">
+      <div class="bg-red-500/20 border border-red-500 rounded-3xl p-5 max-w-[85%] md:max-w-[70%]">
         ❌ AI haijaunganishwa vizuri.
       </div>
     `;
