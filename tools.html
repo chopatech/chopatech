@@ -19,7 +19,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -35,7 +34,6 @@ color:white;
 }
 
 /* THREE BG */
-
 #bgCanvas{
 position:fixed;
 top:0;
@@ -46,7 +44,6 @@ z-index:-5;
 }
 
 /* NAVBAR */
-
 nav{
 position:fixed;
 top:0;
@@ -55,8 +52,9 @@ width:100%;
 z-index:1000;
 padding:18px 7%;
 display:flex;
-justify-content:space-between;
+justify-content:flex-start;
 align-items:center;
+gap:24px;
 backdrop-filter:blur(20px);
 background:rgba(5,10,20,0.45);
 border-bottom:1px solid rgba(255,255,255,0.08);
@@ -68,6 +66,7 @@ font-weight:800;
 background:linear-gradient(to right,#00d4ff,#8b5cf6);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
+margin-right:auto;
 }
 
 nav ul{
@@ -91,10 +90,10 @@ color:#00d4ff;
 display:none;
 font-size:28px;
 cursor:pointer;
+user-select:none;
 }
 
 /* HERO */
-
 .hero{
 min-height:100vh;
 display:flex;
@@ -165,7 +164,6 @@ background:rgba(255,255,255,0.07);
 }
 
 /* SECTION */
-
 .section{
 padding:120px 8%;
 position:relative;
@@ -188,7 +186,6 @@ margin-bottom:80px;
 }
 
 /* TOOL CARDS */
-
 .tools-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
@@ -231,31 +228,24 @@ object-fit:cover;
 }
 
 @keyframes slide{
-
 0%{
 transform:translateX(0%);
 }
-
 30%{
 transform:translateX(0%);
 }
-
 35%{
 transform:translateX(-33.333%);
 }
-
 65%{
 transform:translateX(-33.333%);
 }
-
 70%{
 transform:translateX(-66.666%);
 }
-
 100%{
 transform:translateX(-66.666%);
 }
-
 }
 
 .tool-content{
@@ -290,7 +280,6 @@ transform:scale(1.05);
 }
 
 /* FLOATING */
-
 .glow{
 position:absolute;
 width:500px;
@@ -312,19 +301,15 @@ bottom:100px;
 }
 
 @keyframes float{
-
 0%,100%{
 transform:translateY(0px);
 }
-
 50%{
 transform:translateY(-40px);
 }
-
 }
 
 /* FOOTER */
-
 footer{
 padding:50px 8%;
 text-align:center;
@@ -333,13 +318,20 @@ color:#94a3b8;
 }
 
 /* MOBILE */
-
 @media(max-width:900px){
+
+nav{
+justify-content:flex-start;
+}
+
+.logo{
+margin-right:auto;
+}
 
 nav ul{
 position:absolute;
 top:80px;
-right:-100%;
+left:-100%;
 width:260px;
 height:100vh;
 background:#020617;
@@ -349,11 +341,12 @@ transition:0.5s;
 }
 
 nav ul.active{
-right:0;
+left:0;
 }
 
 .menu-btn{
 display:block;
+order:0;
 }
 
 .hero{
@@ -365,7 +358,6 @@ font-size:2.2rem;
 }
 
 }
-
 </style>
 </head>
 <body>
@@ -376,9 +368,8 @@ font-size:2.2rem;
 <div class="glow glow2"></div>
 
 <!-- NAVBAR -->
-
 <nav>
-
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
 <div class="logo">ChopaTech Tools</div>
 
 <ul id="menu">
@@ -387,17 +378,11 @@ font-size:2.2rem;
 <li><a href="#future">Future</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
-
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
-
 </nav>
 
 <!-- HERO -->
-
 <section class="hero">
-
 <div class="hero-content">
-
 <h1>Future Tools Experience</h1>
 
 <p>
@@ -412,15 +397,11 @@ camera movement effects and advanced futuristic interaction.
 <a href="#tools" class="btn-primary">Explore Tools</a>
 <a href="#" class="btn-secondary">Launch Platform</a>
 </div>
-
 </div>
-
 </section>
 
 <!-- TOOLS -->
-
 <section class="section" id="tools">
-
 <h2 class="section-title">Our Creative Tools</h2>
 
 <p class="section-sub">
@@ -431,108 +412,72 @@ editing, AI generation and futuristic engineering experience.
 <div class="tools-grid">
 
 <!-- CHOPAEDITOR -->
-
 <div class="tool-card">
-
 <div class="slider">
 <div class="slides">
-
 <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1600&auto=format&fit=crop">
-
 </div>
 </div>
 
 <div class="tool-content">
-
 <h3>ChopaEditor</h3>
-
 <p>
 Advanced editing platform with AI image processing,
 video editing systems, futuristic transitions,
 motion graphics and modern creator tools.
 </p>
-
 <button>Open Tool</button>
-
 </div>
-
 </div>
 
 <!-- MYPHONEDOCTOR -->
-
 <div class="tool-card">
-
 <div class="slider">
 <div class="slides">
-
 <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1600&auto=format&fit=crop">
-
 </div>
 </div>
 
 <div class="tool-content">
-
 <h3>MyPhoneDoctor</h3>
-
 <p>
 Smart repair and diagnostics system for mobile devices,
 software fixing, hardware monitoring and AI powered phone optimization.
 </p>
-
 <button>Launch Repair</button>
-
 </div>
-
 </div>
 
 <!-- CHOPACARTOON3D -->
-
 <div class="tool-card">
-
 <div class="slider">
 <div class="slides">
-
 <img src="https://images.unsplash.com/photo-1633419461186-7d40a38105ec?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&w=1600&auto=format&fit=crop">
-
 <img src="https://images.unsplash.com/photo-1638803040283-7a5ffd48dad5?q=80&w=1600&auto=format&fit=crop">
-
 </div>
 </div>
 
 <div class="tool-content">
-
 <h3>ChopaCartoon3D</h3>
-
 <p>
 Create futuristic cartoon characters, cinematic avatars,
 3D animation scenes and AI generated digital worlds
 with modern rendering effects.
 </p>
-
 <button>Create 3D Art</button>
-
+</div>
 </div>
 
 </div>
-
-</div>
-
 </section>
 
 <!-- FUTURE -->
-
 <section class="section" id="future">
-
 <h2 class="section-title">Future Innovation</h2>
 
 <p class="section-sub">
@@ -542,7 +487,6 @@ into one connected ecosystem.
 </p>
 
 <div class="tools-grid">
-
 <div class="tool-card">
 <div class="tool-content">
 <h3>AI Integration</h3>
@@ -575,15 +519,11 @@ future hosting and advanced platform scalability.
 <button>Connect</button>
 </div>
 </div>
-
 </div>
-
 </section>
 
 <!-- FOOTER -->
-
 <footer id="contact">
-
 <h2 style="font-size:2rem;font-weight:800;margin-bottom:20px;">
 ChopaTech Future Systems
 </h2>
@@ -591,19 +531,14 @@ ChopaTech Future Systems
 <p>
 Designing Future Technology With Innovation & Creativity
 </p>
-
 </footer>
 
 <script>
-
-/* MOBILE MENU */
-
 function toggleMenu(){
 document.getElementById("menu").classList.toggle("active");
 }
 
 /* THREE JS */
-
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
@@ -620,21 +555,15 @@ antialias:true
 });
 
 renderer.setSize(window.innerWidth,window.innerHeight);
-
 camera.position.z = 15;
 
 /* PARTICLES */
-
 const particlesGeometry = new THREE.BufferGeometry();
-
 const particlesCount = 2500;
-
 const posArray = new Float32Array(particlesCount * 3);
 
 for(let i=0;i<particlesCount * 3;i++){
-
 posArray[i] = (Math.random() - 0.5) * 100;
-
 }
 
 particlesGeometry.setAttribute(
@@ -655,7 +584,6 @@ particlesMaterial
 scene.add(particlesMesh);
 
 /* GEOMETRY */
-
 const sphereGeo = new THREE.TorusKnotGeometry(3,0.8,120,16);
 
 const sphereMat = new THREE.MeshStandardMaterial({
@@ -664,21 +592,15 @@ wireframe:true
 });
 
 const sphere = new THREE.Mesh(sphereGeo,sphereMat);
-
 scene.add(sphere);
 
 /* LIGHT */
-
 const light = new THREE.PointLight("#00d4ff",2);
-
 light.position.set(10,10,10);
-
 scene.add(light);
 
 /* MOUSE CAMERA */
-
 document.addEventListener("mousemove",(e)=>{
-
 const x = (e.clientX / window.innerWidth - 0.5) * 2;
 const y = (e.clientY / window.innerHeight - 0.5) * 2;
 
@@ -687,13 +609,10 @@ x:x * 3,
 y:-y * 3,
 duration:1
 });
-
 });
 
 /* ANIMATION */
-
 function animate(){
-
 requestAnimationFrame(animate);
 
 sphere.rotation.x += 0.002;
@@ -702,23 +621,16 @@ sphere.rotation.y += 0.003;
 particlesMesh.rotation.y += 0.0008;
 
 renderer.render(scene,camera);
-
 }
 
 animate();
 
 /* RESIZE */
-
 window.addEventListener("resize",()=>{
-
 camera.aspect = window.innerWidth/window.innerHeight;
-
 camera.updateProjectionMatrix();
-
 renderer.setSize(window.innerWidth,window.innerHeight);
-
 });
-
 </script>
 
 </body>
