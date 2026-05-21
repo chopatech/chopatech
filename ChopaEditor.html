@@ -675,6 +675,91 @@ border-radius:10px;
 background:transparent;
 }
 
+/* transform box and handles */ 
+
+.canvas-wrapper{
+  position: relative;
+  transform-origin: center;
+}
+
+.transform-box{
+  position: absolute;
+  border: 2px dashed #ff3366;
+  pointer-events: none;
+  z-index: 99999;
+  box-sizing: border-box;
+}
+
+.transform-handle{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border: 2px solid #ff3366;
+  pointer-events: auto;
+}
+
+/* corners */
+.handle-nw{top:-6px;left:-6px;cursor:nwse-resize;}
+.handle-ne{top:-6px;right:-6px;cursor:nesw-resize;}
+.handle-sw{bottom:-6px;left:-6px;cursor:nesw-resize;}
+.handle-se{bottom:-6px;right:-6px;cursor:nwse-resize;}
+
+/* edges */
+.handle-n{top:-6px;left:50%;transform:translateX(-50%);cursor:n-resize;}
+.handle-s{bottom:-6px;left:50%;transform:translateX(-50%);cursor:s-resize;}
+.handle-w{left:-6px;top:50%;transform:translateY(-50%);cursor:w-resize;}
+.handle-e{right:-6px;top:50%;transform:translateY(-50%);cursor:e-resize;}
+
+/* rotation */
+
+.rotation-line{
+  position:absolute;
+  width:2px;
+  height:28px;
+  background:#ff3366;
+  left:50%;
+  top:-34px;
+  transform:translateX(-50%);
+}
+
+.rotation-handle{
+  position:absolute;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:#ff3366;
+  border:3px solid white;
+  left:50%;
+  top:-52px;
+  transform:translateX(-50%);
+  cursor:grab;
+  pointer-events:auto;
+  box-shadow:0 0 10px rgba(255,51,102,.5);
+}
+ 
+/* snapping lines */
+
+.snap-line{
+  position:absolute;
+  background:#ff3366;
+  z-index:999999;
+  display:none;
+  pointer-events:none;
+}
+
+.snap-line.vertical{
+  width:2px;
+  height:100%;
+  top:0;
+}
+
+.snap-line.horizontal{
+  height:2px;
+  width:100%;
+  left:0;
+}
+
 </style>
 </head>
 
@@ -810,9 +895,30 @@ Share / Download
 
 <div class="workspace-grid" id="workspaceGrid"></div>
 
+<div id="snapVertical" class="snap-line vertical"></div>
+<div id="snapHorizontal" class="snap-line horizontal"></div>
+
 <div class="canvas-wrapper" id="canvasWrapper">
 
-<div class="canvas" id="canvas"></div>
+    <div class="canvas" id="canvas"></div>
+
+  <div id="transformBox" class="transform-box" style="display:none;">
+
+     <!-- resize handlers -->
+    <div class="transform-handle handle-nw" data-dir="nw"></div>
+    <div class="transform-handle handle-ne" data-dir="ne"></div>
+    <div class="transform-handle handle-sw" data-dir="sw"></div>
+    <div class="transform-handle handle-se" data-dir="se"></div>
+
+    <div class="transform-handle handle-n" data-dir="n"></div>
+    <div class="transform-handle handle-s" data-dir="s"></div>
+    <div class="transform-handle handle-w" data-dir="w"></div>
+    <div class="transform-handle handle-e" data-dir="e"></div>
+
+      <!-- ROTATION -->
+  <div class="rotation-line"></div>
+  <div class="rotation-handle" id="rotationHandle"></div>
+  </div>
 
 </div>
 
@@ -1011,12 +1117,19 @@ offsetY:0,
 history:[],
 historyIndex:-1,
 showGrid:true,
-page:1
+page:1,
+snapThreshold:8,
 };
 
 const canvas = document.getElementById('canvas');
 const canvasWrapper = document.getElementById('canvasWrapper');
 const workspaceGrid = document.getElementById('workspaceGrid');
+
+const snapVertical =
+document.getElementById("snapVertical");
+
+const snapHorizontal =
+document.getElementById("snapHorizontal");
 
 canvasWrapper.style.transform = `scale(${AppState.zoom})`;
 
@@ -1434,6 +1547,61 @@ return el;
 
 }
 
+function applySnapping(data){
+
+  const canvasCenterX = AppState.canvasWidth / 2;
+  const canvasCenterY = AppState.canvasHeight / 2;
+
+  const elementCenterX = data.x + data.width/2;
+  const elementCenterY = data.y + data.height/2;
+
+  let snappedX = data.x;
+  let snappedY = data.y;
+
+  let showV = false;
+  let showH = false;
+
+  // CENTER SNAP X
+  if(
+    Math.abs(elementCenterX - canvasCenterX)
+    < AppState.snapThreshold
+  ){
+
+    snappedX =
+      canvasCenterX - data.width/2;
+
+    showV = true;
+
+    snapVertical.style.left =
+      canvasCenterX + "px";
+  }
+
+  // CENTER SNAP Y
+  if(
+    Math.abs(elementCenterY - canvasCenterY)
+    < AppState.snapThreshold
+  ){
+
+    snappedY =
+      canvasCenterY - data.height/2;
+
+    showH = true;
+
+    snapHorizontal.style.top =
+      canvasCenterY + "px";
+  }
+
+  // SHOW/HIDE GUIDES
+  snapVertical.style.display =
+    showV ? "block" : "none";
+
+  snapHorizontal.style.display =
+    showH ? "block" : "none";
+
+  data.x = snappedX;
+  data.y = snappedY;
+}
+
 function makeDraggable(el,data){
 
 el.addEventListener('mousedown',(e)=>{
@@ -1461,11 +1629,16 @@ data.x =
 data.y =
 (e.clientY - AppState.offsetY);
 
+applySnapping(data);
+
 updateElement(el,data);
 
 });
 
 document.addEventListener('mouseup',()=>{
+
+    snapVertical.style.display = "none";
+    snapHorizontal.style.display = "none";
 
 if(AppState.dragging){
 saveHistory();
@@ -2256,6 +2429,207 @@ hideWelcome();
 
 saveHistory();
 
+</script>
+
+/* ===== CANVA STYLE TRANSFORM BOX SYSTEM ===== */
+<script>
+(function () {
+
+  const canvas = document.getElementById("canvas");
+  const transformBox = document.getElementById("transformBox");
+
+  let activeHandle = null;
+  let rotating = false;
+  let startAngle = 0;
+  let startRotation = 0;
+  let startX = 0, startY = 0;
+  let startW = 0, startH = 0, startXpos = 0, startYpos = 0;
+
+  function getEl() {
+    if (!AppState.selected) return null;
+    return document.querySelector(`[data-id="${AppState.selected.id}"]`);
+  }
+
+  function updateBox() {
+    const el = getEl();
+    if (!el) {
+      transformBox.style.display = "none";
+      return;
+    }
+
+    transformBox.style.display = "block";
+    transformBox.style.left = AppState.selected.x + "px";
+    transformBox.style.top = AppState.selected.y + "px";
+    transformBox.style.width = AppState.selected.width + "px";
+    transformBox.style.height = AppState.selected.height + "px";
+
+    transformBox.style.transform =
+  `rotate(${AppState.selected.rotation || 0}deg)`;
+  }
+
+  function startResize(dir, e) {
+    const el = getEl();
+    if (!el) return;
+
+    activeHandle = dir;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    startW = AppState.selected.width;
+    startH = AppState.selected.height;
+    startXpos = AppState.selected.x;
+    startYpos = AppState.selected.y;
+
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", stop);
+  }
+
+  function move(e) {
+    if (!activeHandle || !AppState.selected) return;
+
+    const dx = (e.clientX - startX) / AppState.zoom;
+    const dy = (e.clientY - startY) / AppState.zoom;
+
+    let w = startW;
+    let h = startH;
+    let x = startXpos;
+    let y = startYpos;
+
+    switch (activeHandle) {
+      case "se": w += dx; h += dy; break;
+      case "e": w += dx; break;
+      case "s": h += dy; break;
+      case "nw": w -= dx; h -= dy; x += dx; y += dy; break;
+      case "ne": w += dx; h -= dy; y += dy; break;
+      case "sw": w -= dx; h += dy; x += dx; break;
+      case "w": w -= dx; x += dx; break;
+      case "n": h -= dy; y += dy; break;
+    }
+
+    if (w > 20) AppState.selected.width = w;
+    if (h > 20) AppState.selected.height = h;
+
+    AppState.selected.x = x;
+    AppState.selected.y = y;
+
+    const el = getEl();
+    if (el) {
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.width = w + "px";
+      el.style.height = h + "px";
+    }
+
+    updateBox();
+    updateProperties(AppState.selected);
+  }
+
+  function stop() {
+    activeHandle = null;
+    document.removeEventListener("mousemove", move);
+    document.removeEventListener("mouseup", stop);
+    saveHistory();
+  }
+
+  function startRotate(e){
+
+  if(!AppState.selected) return;
+
+  rotating = true;
+
+  const rect = transformBox.getBoundingClientRect();
+
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  startAngle =
+    Math.atan2(
+      e.clientY - cy,
+      e.clientX - cx
+    ) * 180 / Math.PI;
+
+  startRotation = AppState.selected.rotation || 0;
+
+  document.addEventListener("mousemove", rotateMove);
+  document.addEventListener("mouseup", stopRotate);
+}
+
+function rotateMove(e){
+
+  if(!rotating || !AppState.selected) return;
+
+  const rect = transformBox.getBoundingClientRect();
+
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  const currentAngle =
+    Math.atan2(
+      e.clientY - cy,
+      e.clientX - cx
+    ) * 180 / Math.PI;
+
+  const rotation =
+    startRotation + (currentAngle - startAngle);
+
+  AppState.selected.rotation = rotation;
+
+  const el = getEl();
+
+  if(el){
+    el.style.transform = `rotate(${rotation}deg)`;
+  }
+
+  transformBox.style.transform =
+    `rotate(${rotation}deg)`;
+
+  document.getElementById("propRotate").value =
+    rotation;
+}
+
+function stopRotate(){
+
+  rotating = false;
+
+  document.removeEventListener(
+    "mousemove",
+    rotateMove
+  );
+
+  document.removeEventListener(
+    "mouseup",
+    stopRotate
+  );
+
+  saveHistory();
+}
+
+  document.querySelectorAll(".transform-handle").forEach(h => {
+    h.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      startResize(h.dataset.dir, e);
+    });
+  });
+
+  const oldSelect = selectElement;
+  selectElement = function (el, data) {
+    oldSelect(el, data);
+    setTimeout(updateBox, 10);
+  };
+
+  document.addEventListener("click", () => {
+    setTimeout(updateBox, 10);
+  });
+
+  document.getElementById("rotationHandle")
+.addEventListener("mousedown",(e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  startRotate(e);
+});
+
+})();
 </script>
 
 </body>
