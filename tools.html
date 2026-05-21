@@ -29,12 +29,14 @@ scroll-behavior:smooth;
 
 html, body{
 width:100%;
+max-width:100%;
 overflow-x:hidden;
 }
 
 body{
 background:#020617;
 color:white;
+position:relative;
 }
 
 /* THREE BG */
@@ -42,9 +44,10 @@ color:white;
 position:fixed;
 top:0;
 left:0;
-width:100%;
-height:100%;
+width:100vw;
+height:100vh;
 z-index:-5;
+pointer-events:none;
 }
 
 /* NAVBAR */
@@ -53,6 +56,7 @@ position:fixed;
 top:0;
 left:0;
 width:100%;
+max-width:100%;
 z-index:1000;
 padding:18px 7%;
 display:flex;
@@ -93,11 +97,13 @@ color:#00d4ff;
 
 .menu-btn{
 display:none;
-font-size:32px;
+font-size:34px;
 cursor:pointer;
 user-select:none;
-color:#ffffff;
+color:#ffffff !important;
 line-height:1;
+-webkit-text-fill-color:#ffffff;
+text-shadow:none;
 }
 
 /* HERO */
@@ -108,9 +114,13 @@ align-items:center;
 justify-content:center;
 padding:120px 8%;
 position:relative;
+width:100%;
+max-width:100%;
+overflow:hidden;
 }
 
 .hero-content{
+width:100%;
 max-width:1100px;
 text-align:center;
 z-index:2;
@@ -140,6 +150,7 @@ display:flex;
 justify-content:center;
 gap:20px;
 flex-wrap:wrap;
+width:100%;
 }
 
 .hero-buttons a{
@@ -174,6 +185,9 @@ background:rgba(255,255,255,0.07);
 .section{
 padding:120px 8%;
 position:relative;
+width:100%;
+max-width:100%;
+overflow:hidden;
 }
 
 .section-title{
@@ -195,8 +209,10 @@ margin-bottom:80px;
 /* TOOL CARDS */
 .tools-grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(0,1fr));
 gap:35px;
+width:100%;
+max-width:100%;
 }
 
 .tool-card{
@@ -208,6 +224,7 @@ border-radius:30px;
 overflow:hidden;
 transition:0.5s;
 box-shadow:0 15px 50px rgba(0,0,0,0.3);
+min-width:0;
 }
 
 .tool-card:hover{
@@ -219,6 +236,7 @@ box-shadow:0 20px 70px rgba(0,212,255,0.2);
 position:relative;
 height:250px;
 overflow:hidden;
+width:100%;
 }
 
 .slides{
@@ -232,27 +250,16 @@ animation:slide 12s infinite;
 width:100%;
 height:100%;
 object-fit:cover;
+display:block;
 }
 
 @keyframes slide{
-0%{
-transform:translateX(0%);
-}
-30%{
-transform:translateX(0%);
-}
-35%{
-transform:translateX(-33.333%);
-}
-65%{
-transform:translateX(-33.333%);
-}
-70%{
-transform:translateX(-66.666%);
-}
-100%{
-transform:translateX(-66.666%);
-}
+0%{transform:translateX(0%);}
+30%{transform:translateX(0%);}
+35%{transform:translateX(-33.333%);}
+65%{transform:translateX(-33.333%);}
+70%{transform:translateX(-66.666%);}
+100%{transform:translateX(-66.666%);}
 }
 
 .tool-content{
@@ -309,12 +316,8 @@ bottom:100px;
 }
 
 @keyframes float{
-0%,100%{
-transform:translateY(0px);
-}
-50%{
-transform:translateY(-40px);
-}
+0%,100%{transform:translateY(0px);}
+50%{transform:translateY(-40px);}
 }
 
 /* FOOTER */
@@ -323,6 +326,9 @@ padding:50px 8%;
 text-align:center;
 border-top:1px solid rgba(255,255,255,0.08);
 color:#94a3b8;
+width:100%;
+max-width:100%;
+overflow:hidden;
 }
 
 /* MOBILE */
@@ -335,12 +341,16 @@ padding:16px 5%;
 .logo{
 margin-right:auto;
 font-size:22px;
+max-width:70%;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 .menu-btn{
 display:block;
 order:0;
-color:#ffffff;
+color:#ffffff !important;
+-webkit-text-fill-color:#ffffff;
 }
 
 nav ul{
@@ -348,6 +358,7 @@ position:absolute;
 top:74px;
 left:-100%;
 width:100%;
+max-width:100%;
 height:calc(100vh - 74px);
 background:#020617;
 flex-direction:column;
@@ -355,6 +366,8 @@ padding:36px 24px;
 transition:0.45s ease;
 gap:22px;
 border-top:1px solid rgba(255,255,255,0.08);
+overflow-y:auto;
+overflow-x:hidden;
 }
 
 nav ul.active{
@@ -403,6 +416,11 @@ font-size:1.6rem;
 font-size:0.98rem;
 }
 
+.hero-buttons{
+flex-direction:column;
+align-items:center;
+}
+
 .hero-buttons a{
 width:100%;
 max-width:320px;
@@ -438,7 +456,9 @@ font-size:19px;
 }
 
 .menu-btn{
-font-size:30px;
+font-size:32px;
+color:#ffffff !important;
+-webkit-text-fill-color:#ffffff;
 }
 
 .hero{
@@ -520,9 +540,9 @@ editing, AI generation and futuristic engineering experience.
 <div class="tool-card">
 <div class="slider">
 <div class="slides">
-<img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1600&auto=format&fit=crop">
+<img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop" alt="ChopaEditor 1">
+<img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1600&auto=format&fit=crop" alt="ChopaEditor 2">
+<img src="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1600&auto=format&fit=crop" alt="ChopaEditor 3">
 </div>
 </div>
 
@@ -541,9 +561,9 @@ motion graphics and modern creator tools.
 <div class="tool-card">
 <div class="slider">
 <div class="slides">
-<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1600&auto=format&fit=crop">
+<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=1600&auto=format&fit=crop" alt="MyPhoneDoctor 1">
+<img src="https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=1600&auto=format&fit=crop" alt="MyPhoneDoctor 2">
+<img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=1600&auto=format&fit=crop" alt="MyPhoneDoctor 3">
 </div>
 </div>
 
@@ -561,9 +581,9 @@ software fixing, hardware monitoring and AI powered phone optimization.
 <div class="tool-card">
 <div class="slider">
 <div class="slides">
-<img src="https://images.unsplash.com/photo-1633419461186-7d40a38105ec?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&w=1600&auto=format&fit=crop">
-<img src="https://images.unsplash.com/photo-1638803040283-7a5ffd48dad5?q=80&w=1600&auto=format&fit=crop">
+<img src="https://images.unsplash.com/photo-1633419461186-7d40a38105ec?q=80&w=1600&auto=format&fit=crop" alt="ChopaCartoon3D 1">
+<img src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&w=1600&auto=format&fit=crop" alt="ChopaCartoon3D 2">
+<img src="https://images.unsplash.com/photo-1638803040283-7a5ffd48dad5?q=80&w=1600&auto=format&fit=crop" alt="ChopaCartoon3D 3">
 </div>
 </div>
 
