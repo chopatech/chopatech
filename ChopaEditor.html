@@ -185,6 +185,7 @@ input[type="file"]{color:#fff;max-width:100%;}
   z-index:99999;
   box-sizing:border-box;
   transform-origin:center center;
+  will-change:transform,left,top,width,height;
 }
 .transform-handle{
   position:absolute;
@@ -260,13 +261,16 @@ input[type="file"]{color:#fff;max-width:100%;}
   display:none;
   z-index:100000;
   gap:8px;
-  padding:8px;
-  border-radius:16px;
-  background:rgba(17,24,39,.95);
+  padding:10px 12px;
+  border-radius:18px;
+  background:rgba(17,24,39,.96);
   border:1px solid rgba(255,255,255,.08);
   box-shadow:0 12px 40px rgba(0,0,0,.35);
   backdrop-filter:blur(12px);
   pointer-events:auto;
+  align-items:center;
+  flex-wrap:wrap;
+  max-width:min(92vw, 520px);
 }
 .selection-bubble .bubble-btn{
   min-width:38px;
@@ -288,6 +292,15 @@ input[type="file"]{color:#fff;max-width:100%;}
   width:1px;
   background:rgba(255,255,255,.08);
   margin:0 2px;
+}
+
+.selection-bubble .bubble-grip{
+  width:42px;
+  height:5px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  flex:0 0 42px;
+  margin-right:4px;
 }
 
 /* MODAL */
@@ -352,6 +365,22 @@ input[type="file"]{color:#fff;max-width:100%;}
   .welcome-box p{font-size:14px;}
   .transform-handle{width:12px;height:12px;}
   .rotation-handle{width:18px;height:18px;top:-48px;}
+
+  .selection-bubble{
+    max-width:calc(100vw - 18px);
+    gap:6px;
+    padding:8px 10px;
+    border-radius:16px;
+  }
+  .selection-bubble .bubble-btn{
+    min-width:36px;
+    height:36px;
+    font-size:15px;
+  }
+  .selection-bubble .bubble-grip{
+    width:36px;
+    flex-basis:36px;
+  }
 }
 </style>
 </head>
@@ -414,30 +443,31 @@ input[type="file"]{color:#fff;max-width:100%;}
 
       <div class="canvas-wrapper" id="canvasWrapper">
         <div class="canvas" id="canvas"></div>
+      </div>
 
-        <div id="transformBox" class="transform-box" style="display:none;">
-          <div class="transform-handle handle-nw" data-dir="nw"></div>
-          <div class="transform-handle handle-ne" data-dir="ne"></div>
-          <div class="transform-handle handle-sw" data-dir="sw"></div>
-          <div class="transform-handle handle-se" data-dir="se"></div>
-          <div class="transform-handle handle-n" data-dir="n"></div>
-          <div class="transform-handle handle-s" data-dir="s"></div>
-          <div class="transform-handle handle-w" data-dir="w"></div>
-          <div class="transform-handle handle-e" data-dir="e"></div>
-          <div class="rotation-line"></div>
-          <div class="rotation-handle" id="rotationHandle"></div>
-        </div>
+      <div id="transformBox" class="transform-box" style="display:none;">
+        <div class="transform-handle handle-nw" data-dir="nw"></div>
+        <div class="transform-handle handle-ne" data-dir="ne"></div>
+        <div class="transform-handle handle-sw" data-dir="sw"></div>
+        <div class="transform-handle handle-se" data-dir="se"></div>
+        <div class="transform-handle handle-n" data-dir="n"></div>
+        <div class="transform-handle handle-s" data-dir="s"></div>
+        <div class="transform-handle handle-w" data-dir="w"></div>
+        <div class="transform-handle handle-e" data-dir="e"></div>
+        <div class="rotation-line"></div>
+        <div class="rotation-handle" id="rotationHandle"></div>
+      </div>
 
-        <div id="selectionBubble" class="selection-bubble">
-          <button class="bubble-btn" id="bubbleUndo" title="Undo">↶</button>
-          <button class="bubble-btn" id="bubbleRedo" title="Redo">↷</button>
-          <div class="bubble-divider"></div>
-          <button class="bubble-btn" id="bubbleDuplicate" title="Duplicate">⧉</button>
-          <button class="bubble-btn" id="bubbleDelete" title="Delete">🗑</button>
-          <div class="bubble-divider"></div>
-          <button class="bubble-btn" id="bubbleFront" title="Bring Forward">⬆</button>
-          <button class="bubble-btn" id="bubbleBack" title="Send Backward">⬇</button>
-        </div>
+      <div id="selectionBubble" class="selection-bubble">
+        <div class="bubble-grip"></div>
+        <button class="bubble-btn" id="bubbleUndo" title="Undo">↶</button>
+        <button class="bubble-btn" id="bubbleRedo" title="Redo">↷</button>
+        <div class="bubble-divider"></div>
+        <button class="bubble-btn" id="bubbleDuplicate" title="Duplicate">⧉</button>
+        <button class="bubble-btn" id="bubbleDelete" title="Delete">🗑</button>
+        <div class="bubble-divider"></div>
+        <button class="bubble-btn" id="bubbleFront" title="Bring Forward">⬆</button>
+        <button class="bubble-btn" id="bubbleBack" title="Send Backward">⬇</button>
       </div>
 
       <div class="welcome" id="welcome">
@@ -1129,11 +1159,15 @@ saveHistory();
       updateSelectionBubble(null);
       return;
     }
+
+    const workspaceRect = workspace.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+
     transformBox.style.display = "block";
-    transformBox.style.left = AppState.selected.x + "px";
-    transformBox.style.top = AppState.selected.y + "px";
-    transformBox.style.width = AppState.selected.width + "px";
-    transformBox.style.height = AppState.selected.height + "px";
+    transformBox.style.left = (rect.left - workspaceRect.left) + "px";
+    transformBox.style.top = (rect.top - workspaceRect.top) + "px";
+    transformBox.style.width = rect.width + "px";
+    transformBox.style.height = rect.height + "px";
     transformBox.style.transform = `rotate(${AppState.selected.rotation || 0}deg)`;
     updateSelectionBubble(el);
   }
@@ -1145,16 +1179,15 @@ saveHistory();
     }
 
     const workspaceRect = workspace.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
     const boxRect = transformBox.getBoundingClientRect();
 
-    const bubbleWidth = selectionBubble.offsetWidth || 240;
-    const bubbleHeight = selectionBubble.offsetHeight || 52;
+    const bubbleWidth = selectionBubble.offsetWidth || 420;
+    const bubbleHeight = selectionBubble.offsetHeight || 56;
 
     let left = (boxRect.left - workspaceRect.left) + (boxRect.width - bubbleWidth) / 2;
-    let top = (boxRect.top - workspaceRect.top) - bubbleHeight - 12;
+    let top = (boxRect.top - workspaceRect.top) - bubbleHeight - 14;
 
-    if(top < 8) top = (boxRect.bottom - workspaceRect.top) + 12;
+    if(top < 10) top = (boxRect.bottom - workspaceRect.top) + 14;
 
     left = Math.max(8, Math.min(left, workspaceRect.width - bubbleWidth - 8));
 
@@ -1172,8 +1205,12 @@ saveHistory();
     startH = AppState.selected.height;
     startXpos = AppState.selected.x;
     startYpos = AppState.selected.y;
-    document.addEventListener("mousemove",resizeMove);
-    document.addEventListener("mouseup",stopResize);
+
+    if(e.pointerId != null && e.target?.setPointerCapture){
+      try{ e.target.setPointerCapture(e.pointerId); }catch(_){}
+    }
+    document.addEventListener("pointermove",resizeMove);
+    document.addEventListener("pointerup",stopResize);
   }
 
   function resizeMove(e){
@@ -1214,8 +1251,8 @@ saveHistory();
 
   function stopResize(){
     activeHandle = null;
-    document.removeEventListener("mousemove",resizeMove);
-    document.removeEventListener("mouseup",stopResize);
+    document.removeEventListener("pointermove",resizeMove);
+    document.removeEventListener("pointerup",stopResize);
     saveHistory();
   }
 
@@ -1227,8 +1264,8 @@ saveHistory();
     const cy = rect.top + rect.height / 2;
     startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
     startRotation = AppState.selected.rotation || 0;
-    document.addEventListener("mousemove",rotateMove);
-    document.addEventListener("mouseup",stopRotate);
+    document.addEventListener("pointermove",rotateMove);
+    document.addEventListener("pointerup",stopRotate);
   }
 
   function rotateMove(e){
@@ -1243,23 +1280,24 @@ saveHistory();
     if(el) el.style.transform = `rotate(${rotation}deg)`;
     transformBox.style.transform = `rotate(${rotation}deg)`;
     document.getElementById("propRotate").value = rotation;
+    updateSelectionBubble(el);
   }
 
   function stopRotate(){
     rotating = false;
-    document.removeEventListener("mousemove",rotateMove);
-    document.removeEventListener("mouseup",stopRotate);
+    document.removeEventListener("pointermove",rotateMove);
+    document.removeEventListener("pointerup",stopRotate);
     saveHistory();
   }
 
   document.querySelectorAll(".transform-handle").forEach(h=>{
-    h.addEventListener("mousedown",(e)=>{ e.preventDefault(); e.stopPropagation(); startResize(h.dataset.dir,e); });
-    h.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; e.preventDefault(); e.stopPropagation(); startResize(h.dataset.dir,{clientX:t.clientX,clientY:t.clientY}); },{passive:false});
+    h.addEventListener("pointerdown",(e)=>{ e.preventDefault(); e.stopPropagation(); startResize(h.dataset.dir,e); });
+    h.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; e.preventDefault(); e.stopPropagation(); startResize(h.dataset.dir,{clientX:t.clientX,clientY:t.clientY,pointerId:1,target:h}); },{passive:false});
   });
 
   const rotateHandle = document.getElementById("rotationHandle");
-  rotateHandle.addEventListener("mousedown",(e)=>{ e.preventDefault(); e.stopPropagation(); startRotate(e); });
-  rotateHandle.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; e.preventDefault(); e.stopPropagation(); startRotate({clientX:t.clientX,clientY:t.clientY}); },{passive:false});
+  rotateHandle.addEventListener("pointerdown",(e)=>{ e.preventDefault(); e.stopPropagation(); startRotate(e); });
+  rotateHandle.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; e.preventDefault(); e.stopPropagation(); startRotate({clientX:t.clientX,clientY:t.clientY,pointerId:1,target:rotateHandle}); },{passive:false});
 
   const bubbleUndo = document.getElementById("bubbleUndo");
   const bubbleRedo = document.getElementById("bubbleRedo");
@@ -1272,8 +1310,8 @@ saveHistory();
   bubbleRedo.addEventListener("click",(e)=>{ e.stopPropagation(); redo(); updateBox(); });
   bubbleDuplicate.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const copy = JSON.parse(JSON.stringify(AppState.selected)); copy.id = uid(); copy.x += 40; copy.y += 40; AppState.elements.push(copy); createElement(copy); saveHistory(); updateBox(); });
   bubbleDelete.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const id = AppState.selected.id; const target = document.querySelector(`[data-id="${id}"]`); if(target) target.remove(); AppState.elements = AppState.elements.filter(x=>x.id !== id); AppState.selected = null; updateBox(); saveHistory(); });
-  bubbleFront.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.appendChild(target); });
-  bubbleBack.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.prepend(target); });
+  bubbleFront.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.appendChild(target); updateBox(); });
+  bubbleBack.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.prepend(target); updateBox(); });
 
   const oldSelect = selectElement;
   selectElement = function(el,data){ oldSelect(el,data); setTimeout(updateBox,10); };
@@ -1285,6 +1323,8 @@ if(window.innerWidth <= 900){
   canvas.style.touchAction = "none";
   canvasWrapper.style.touchAction = "none";
   workspace.style.touchAction = "none";
+  transformBox.style.touchAction = "none";
+  selectionBubble.style.touchAction = "none";
 }
 function fitCanvasToPhone(){
   if(window.innerWidth > 900) return;
@@ -1337,31 +1377,50 @@ document.querySelectorAll('.sidebar-tab').forEach(tab=>{
 
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 
-  sidebar.addEventListener('pointerdown',(e)=>{
-    if(e.target.closest('.sidebar-tab') || e.target.closest('.sidebar-content')) return;
+  const gripStart = (e)=>{
+    if(!e.target.closest('.sidebar')) return;
+    if(e.target.closest('.sidebar-content')) return;
     draggingDrawer = true;
     startY = e.clientY;
     startHeight = sidebar.getBoundingClientRect().height;
-    sidebar.setPointerCapture?.(e.pointerId);
-  });
+    try{ sidebar.setPointerCapture?.(e.pointerId); }catch(_){}
+  };
 
-  sidebar.addEventListener('pointermove',(e)=>{
+  sidebar.addEventListener('pointerdown', gripStart);
+  sidebar.addEventListener('touchstart',(e)=>{
+    const t = e.touches[0];
+    if(!t) return;
+    draggingDrawer = true;
+    startY = t.clientY;
+    startHeight = sidebar.getBoundingClientRect().height;
+  },{passive:true});
+
+  const move = (clientY)=>{
     if(!draggingDrawer) return;
-    const delta = startY - e.clientY;
+    const delta = startY - clientY;
     const minH = 64;
     const maxH = Math.min(window.innerHeight * 0.62, 420);
     const nextH = clamp(startHeight + delta, minH, maxH);
     sidebar.style.height = nextH + 'px';
     if(nextH > minH + 10) sidebar.classList.add('open');
     else sidebar.classList.remove('open');
-  });
+  };
+
+  sidebar.addEventListener('pointermove',(e)=>{ move(e.clientY); });
+  sidebar.addEventListener('touchmove',(e)=>{
+    if(!draggingDrawer) return;
+    const t = e.touches[0];
+    if(!t) return;
+    e.preventDefault();
+    move(t.clientY);
+  },{passive:false});
 
   const stop = ()=>{
-    if(!draggingDrawer) return;
     draggingDrawer = false;
   };
   document.addEventListener('pointerup', stop);
   document.addEventListener('pointercancel', stop);
+  document.addEventListener('touchend', stop, {passive:true});
 })();
 
 </script>
