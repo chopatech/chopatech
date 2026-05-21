@@ -254,6 +254,42 @@ input[type="file"]{color:#fff;max-width:100%;}
 .swatch{width:100%;aspect-ratio:1;border-radius:10px;cursor:pointer;border:2px solid transparent;}
 .swatch:hover{transform:scale(1.05);}
 
+/* SELECTION ACTION BAR */
+.selection-bubble{
+  position:absolute;
+  display:none;
+  z-index:100000;
+  gap:8px;
+  padding:8px;
+  border-radius:16px;
+  background:rgba(17,24,39,.95);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+  backdrop-filter:blur(12px);
+  pointer-events:auto;
+}
+.selection-bubble .bubble-btn{
+  min-width:38px;
+  height:38px;
+  border:none;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  touch-action:none;
+}
+.selection-bubble .bubble-btn:hover{
+  background:rgba(255,255,255,.16);
+}
+.selection-bubble .bubble-divider{
+  width:1px;
+  background:rgba(255,255,255,.08);
+  margin:0 2px;
+}
+
 /* MODAL */
 .modal{
   position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(10px);
@@ -296,6 +332,18 @@ input[type="file"]{color:#fff;max-width:100%;}
   .sidebar-content{display:none;height:calc(100% - 64px);overflow:auto;padding:14px;}
   .sidebar.open .sidebar-content{display:block;}
   .sidebar-tab{width:44px;height:44px;border-radius:12px;}
+  .sidebar::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:6px;
+    width:48px;
+    height:5px;
+    border-radius:999px;
+    background:rgba(255,255,255,.18);
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
   .pages-bar{position:fixed;left:0;right:0;bottom:64px;height:74px;z-index:999;padding:8px 10px;}
   .page-thumb{width:90px;height:54px;}
   .add-page{width:54px;height:54px;}
@@ -378,6 +426,17 @@ input[type="file"]{color:#fff;max-width:100%;}
           <div class="transform-handle handle-e" data-dir="e"></div>
           <div class="rotation-line"></div>
           <div class="rotation-handle" id="rotationHandle"></div>
+        </div>
+
+        <div id="selectionBubble" class="selection-bubble">
+          <button class="bubble-btn" id="bubbleUndo" title="Undo">↶</button>
+          <button class="bubble-btn" id="bubbleRedo" title="Redo">↷</button>
+          <div class="bubble-divider"></div>
+          <button class="bubble-btn" id="bubbleDuplicate" title="Duplicate">⧉</button>
+          <button class="bubble-btn" id="bubbleDelete" title="Delete">🗑</button>
+          <div class="bubble-divider"></div>
+          <button class="bubble-btn" id="bubbleFront" title="Bring Forward">⬆</button>
+          <button class="bubble-btn" id="bubbleBack" title="Send Backward">⬇</button>
         </div>
       </div>
 
@@ -469,6 +528,7 @@ const workspaceGrid = document.getElementById('workspaceGrid');
 const snapVertical = document.getElementById('snapVertical');
 const snapHorizontal = document.getElementById('snapHorizontal');
 const transformBox = document.getElementById('transformBox');
+const selectionBubble = document.getElementById('selectionBubble');
 const sidebar = document.querySelector('.sidebar');
 const workspace = document.querySelector('.workspace');
 
@@ -1066,6 +1126,7 @@ saveHistory();
     const el = getEl();
     if(!el){
       transformBox.style.display = "none";
+      updateSelectionBubble(null);
       return;
     }
     transformBox.style.display = "block";
@@ -1074,6 +1135,32 @@ saveHistory();
     transformBox.style.width = AppState.selected.width + "px";
     transformBox.style.height = AppState.selected.height + "px";
     transformBox.style.transform = `rotate(${AppState.selected.rotation || 0}deg)`;
+    updateSelectionBubble(el);
+  }
+
+  function updateSelectionBubble(el){
+    if(!el){
+      selectionBubble.style.display = "none";
+      return;
+    }
+
+    const workspaceRect = workspace.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const boxRect = transformBox.getBoundingClientRect();
+
+    const bubbleWidth = selectionBubble.offsetWidth || 240;
+    const bubbleHeight = selectionBubble.offsetHeight || 52;
+
+    let left = (boxRect.left - workspaceRect.left) + (boxRect.width - bubbleWidth) / 2;
+    let top = (boxRect.top - workspaceRect.top) - bubbleHeight - 12;
+
+    if(top < 8) top = (boxRect.bottom - workspaceRect.top) + 12;
+
+    left = Math.max(8, Math.min(left, workspaceRect.width - bubbleWidth - 8));
+
+    selectionBubble.style.display = "flex";
+    selectionBubble.style.left = left + "px";
+    selectionBubble.style.top = top + "px";
   }
 
   function startResize(dir,e){
@@ -1174,6 +1261,20 @@ saveHistory();
   rotateHandle.addEventListener("mousedown",(e)=>{ e.preventDefault(); e.stopPropagation(); startRotate(e); });
   rotateHandle.addEventListener("touchstart",(e)=>{ const t=e.touches[0]; e.preventDefault(); e.stopPropagation(); startRotate({clientX:t.clientX,clientY:t.clientY}); },{passive:false});
 
+  const bubbleUndo = document.getElementById("bubbleUndo");
+  const bubbleRedo = document.getElementById("bubbleRedo");
+  const bubbleDuplicate = document.getElementById("bubbleDuplicate");
+  const bubbleDelete = document.getElementById("bubbleDelete");
+  const bubbleFront = document.getElementById("bubbleFront");
+  const bubbleBack = document.getElementById("bubbleBack");
+
+  bubbleUndo.addEventListener("click",(e)=>{ e.stopPropagation(); undo(); updateBox(); });
+  bubbleRedo.addEventListener("click",(e)=>{ e.stopPropagation(); redo(); updateBox(); });
+  bubbleDuplicate.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const copy = JSON.parse(JSON.stringify(AppState.selected)); copy.id = uid(); copy.x += 40; copy.y += 40; AppState.elements.push(copy); createElement(copy); saveHistory(); updateBox(); });
+  bubbleDelete.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const id = AppState.selected.id; const target = document.querySelector(`[data-id="${id}"]`); if(target) target.remove(); AppState.elements = AppState.elements.filter(x=>x.id !== id); AppState.selected = null; updateBox(); saveHistory(); });
+  bubbleFront.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.appendChild(target); });
+  bubbleBack.addEventListener("click",(e)=>{ e.stopPropagation(); if(!AppState.selected) return; const target = document.querySelector(`[data-id="${AppState.selected.id}"]`); if(target) canvas.prepend(target); });
+
   const oldSelect = selectElement;
   selectElement = function(el,data){ oldSelect(el,data); setTimeout(updateBox,10); };
   document.addEventListener("click",()=>{ setTimeout(updateBox,10); });
@@ -1224,6 +1325,44 @@ workspace.addEventListener("touchend",()=>{ pinchStartDistance = 0; });
 document.querySelectorAll('.sidebar-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{ if(window.innerWidth <= 900) sidebar.classList.add('open'); });
 });
+
+
+/* MOBILE DRAWER DRAG */
+(function(){
+  if(window.innerWidth > 900) return;
+
+  let draggingDrawer = false;
+  let startY = 0;
+  let startHeight = 0;
+
+  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+  sidebar.addEventListener('pointerdown',(e)=>{
+    if(e.target.closest('.sidebar-tab') || e.target.closest('.sidebar-content')) return;
+    draggingDrawer = true;
+    startY = e.clientY;
+    startHeight = sidebar.getBoundingClientRect().height;
+    sidebar.setPointerCapture?.(e.pointerId);
+  });
+
+  sidebar.addEventListener('pointermove',(e)=>{
+    if(!draggingDrawer) return;
+    const delta = startY - e.clientY;
+    const minH = 64;
+    const maxH = Math.min(window.innerHeight * 0.62, 420);
+    const nextH = clamp(startHeight + delta, minH, maxH);
+    sidebar.style.height = nextH + 'px';
+    if(nextH > minH + 10) sidebar.classList.add('open');
+    else sidebar.classList.remove('open');
+  });
+
+  const stop = ()=>{
+    if(!draggingDrawer) return;
+    draggingDrawer = false;
+  };
+  document.addEventListener('pointerup', stop);
+  document.addEventListener('pointercancel', stop);
+})();
 
 </script>
 </body>
