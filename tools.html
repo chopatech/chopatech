@@ -27,9 +27,13 @@ font-family:'Inter',sans-serif;
 scroll-behavior:smooth;
 }
 
+html, body{
+width:100%;
+overflow-x:hidden;
+}
+
 body{
 background:#020617;
-overflow-x:hidden;
 color:white;
 }
 
@@ -67,6 +71,7 @@ background:linear-gradient(to right,#00d4ff,#8b5cf6);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 margin-right:auto;
+white-space:nowrap;
 }
 
 nav ul{
@@ -88,9 +93,11 @@ color:#00d4ff;
 
 .menu-btn{
 display:none;
-font-size:28px;
+font-size:32px;
 cursor:pointer;
 user-select:none;
+color:#ffffff;
+line-height:1;
 }
 
 /* HERO */
@@ -288,6 +295,7 @@ border-radius:50%;
 background:radial-gradient(circle,#00d4ff33,transparent 70%);
 filter:blur(40px);
 animation:float 8s ease-in-out infinite;
+pointer-events:none;
 }
 
 .glow2{
@@ -321,40 +329,137 @@ color:#94a3b8;
 @media(max-width:900px){
 
 nav{
-justify-content:flex-start;
+padding:16px 5%;
 }
 
 .logo{
 margin-right:auto;
+font-size:22px;
+}
+
+.menu-btn{
+display:block;
+order:0;
+color:#ffffff;
 }
 
 nav ul{
 position:absolute;
-top:80px;
+top:74px;
 left:-100%;
-width:260px;
-height:100vh;
+width:100%;
+height:calc(100vh - 74px);
 background:#020617;
 flex-direction:column;
-padding:40px;
-transition:0.5s;
+padding:36px 24px;
+transition:0.45s ease;
+gap:22px;
+border-top:1px solid rgba(255,255,255,0.08);
 }
 
 nav ul.active{
 left:0;
 }
 
-.menu-btn{
-display:block;
-order:0;
+.hero{
+padding:120px 5% 80px;
 }
 
-.hero{
-padding-top:180px;
+.hero p{
+font-size:1rem;
+}
+
+.section{
+padding:90px 5%;
 }
 
 .section-title{
 font-size:2.2rem;
+}
+
+.section-sub{
+margin-bottom:45px;
+font-size:0.98rem;
+}
+
+.tools-grid{
+grid-template-columns:1fr;
+gap:22px;
+}
+
+.slider{
+height:220px;
+}
+
+.tool-content{
+padding:24px;
+}
+
+.tool-content h3{
+font-size:1.6rem;
+}
+
+.tool-content p{
+font-size:0.98rem;
+}
+
+.hero-buttons a{
+width:100%;
+max-width:320px;
+text-align:center;
+}
+
+.glow{
+width:320px;
+height:320px;
+filter:blur(30px);
+}
+
+.glow1{
+left:-140px;
+bottom:40px;
+}
+
+.glow2{
+right:-140px;
+top:120px;
+}
+
+}
+
+@media(max-width:420px){
+
+nav{
+padding:14px 4%;
+}
+
+.logo{
+font-size:19px;
+}
+
+.menu-btn{
+font-size:30px;
+}
+
+.hero{
+padding-top:110px;
+}
+
+.hero h1{
+font-size:2.6rem;
+}
+
+.hero p{
+font-size:0.96rem;
+line-height:1.7;
+}
+
+.section-title{
+font-size:1.9rem;
+}
+
+.tool-content button{
+width:100%;
 }
 
 }
@@ -555,6 +660,7 @@ antialias:true
 });
 
 renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 camera.position.z = 15;
 
 /* PARTICLES */
