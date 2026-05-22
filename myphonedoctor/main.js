@@ -1,15 +1,17 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1600,
     height: 950,
-    minWidth: 1200,
-    minHeight: 800,
+
+    // 👇 PUT ICON HERE (inside BrowserWindow options)
+    icon: path.join(__dirname, 'assets/icon.ico'),
+
     backgroundColor: '#09090b',
     autoHideMenuBar: true,
+
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

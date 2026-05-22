@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "description": "Professional Android Flash Tool",
   "main": "main.js",
-  "author": "MyPhoneDoctor",
-  "license": "MIT",
 
   "scripts": {
     "start": "electron .",
@@ -30,7 +28,8 @@
     ],
 
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icon.ico"
     }
   }
 }
