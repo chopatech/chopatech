@@ -6,9 +6,9 @@ font-family:Inter,Arial,sans-serif;
 }
 
 body{
-  background:transparent;
-  background-image:none;
-  background-color:transparent;
+  background:radial-gradient(circle at top left, rgba(102, 68, 255, 0.18), transparent 18%),
+              radial-gradient(circle at 80% 20%, rgba(0, 255, 204, 0.12), transparent 16%),
+              linear-gradient(180deg, #05050f 0%, #08091b 40%, #090b16 100%);
   color:white;
   line-height:1.6;
   overflow-x:hidden;
@@ -18,7 +18,11 @@ body::before{
 content:'';
 position:fixed;
 inset:0;
-background:rgba(0,0,0,0);
+background:
+  linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,0) 35%),
+  radial-gradient(circle at 20% 10%, rgba(255,255,255,.06), transparent 24%),
+  repeating-linear-gradient(0deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 1px, transparent 1px, transparent 4px);
+opacity:.18;
 z-index:0;
 pointer-events:none;
 }
@@ -31,11 +35,14 @@ color:white;
 .grid-bg{
 position:fixed;
 inset:0;
-background-image:url('https://unsplash.com/photos/a-close-up-of-a-laptop-computer-with-code-on-the-screen-lYFERR5dTG4');
+background-image:
+  radial-gradient(circle at 25% 15%, rgba(102, 68, 255, 0.12), transparent 18%),
+  radial-gradient(circle at 70% 25%, rgba(0, 255, 204, 0.08), transparent 16%),
+  linear-gradient(135deg, rgba(10,15,30,.95), rgba(4,8,14,.92));
 background-size:cover;
 background-position:center;
 background-repeat:no-repeat;
-z-index:0;
+filter:blur(0.6px);
 }
 
 .navbar{
