@@ -1,0 +1,35 @@
+{
+  "name": "myphonedoctor",
+  "version": "1.0.0",
+  "description": "Professional Android Flash Tool",
+  "main": "main.js",
+
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+
+  "build": {
+    "appId": "com.myphonedoctor.flashsuite",
+    "productName": "MyPhoneDoctor",
+
+    "directories": {
+      "output": "dist"
+    },
+
+    "files": [
+      "**/*"
+    ],
+
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  }
+}
