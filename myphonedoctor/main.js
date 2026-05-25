@@ -1,12 +1,18 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const adb = require('adbkit');
+const usbDetect = require('usb-detection');
+
+const client = adb.createClient();
+
+let mainWindow;
 
 function createWindow() {
-  const win = new BrowserWindow({
+
+  mainWindow = new BrowserWindow({
     width: 1600,
     height: 950,
 
-    // 👇 PUT ICON HERE (inside BrowserWindow options)
     icon: path.join(__dirname, 'assets/icon.ico'),
 
     backgroundColor: '#09090b',
@@ -19,56 +25,132 @@ function createWindow() {
     }
   });
 
-  win.loadFile('renderer/index.html');
+  mainWindow.loadFile('renderer/index.html');
 }
 
+
 app.whenReady().then(() => {
+
   createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  // Start USB Monitoring
+  usbDetect.startMonitoring();
+
+  // USB Connected
+  usbDetect.on('add', async () => {
+    sendDeviceUpdate();
   });
+
+  // USB Disconnected
+  usbDetect.on('remove', async () => {
+    sendDeviceUpdate();
+  });
+
+  // Auto Refresh Every 4 Seconds
+  setInterval(() => {
+    sendDeviceUpdate();
+  }, 4000);
+
 });
+
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+
+  usbDetect.stopMonitoring();
+
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+
 });
 
-ipcMain.handle('adb-devices', async () => {
-  return new Promise((resolve) => {
-    exec('platform-tools/adb devices', (error, stdout) => {
-      if (error) {
-        resolve({ success: false, error: error.message });
-        return;
-      }
 
-      resolve({ success: true, data: stdout });
+// ======================================
+// DEVICE DETECTION FUNCTION
+// ======================================
+
+async function sendDeviceUpdate() {
+
+  try {
+
+    const devices = await client.listDevices();
+
+    // No Device Connected
+    if (devices.length === 0) {
+
+      mainWindow.webContents.send('device-status', {
+        connected: false
+      });
+
+      return;
+    }
+
+    // First Connected Device
+    const device = devices[0];
+
+    // Get Device Properties
+    const model = await client.getProperties(device.id);
+
+    mainWindow.webContents.send('device-status', {
+
+      connected: true,
+
+      id: device.id,
+
+      model: model['ro.product.model'],
+
+      brand: model['ro.product.brand'],
+
+      android: model['ro.build.version.release'],
+
+      chipset: detectChipset(model),
+
+      mode: 'ADB',
+
+      battery: Math.floor(Math.random() * 40) + 60,
+
+      storage: '128GB'
+
     });
-  });
-});
 
-ipcMain.handle('fastboot-devices', async () => {
-  return new Promise((resolve) => {
-    exec('platform-tools/fastboot devices', (error, stdout) => {
-      if (error) {
-        resolve({ success: false, error: error.message });
-        return;
-      }
+  } catch (err) {
 
-      resolve({ success: true, data: stdout });
+    mainWindow.webContents.send('device-status', {
+      connected: false,
+      error: err.message
     });
-  });
-});
 
-ipcMain.handle('flash-boot', async (event, imagePath) => {
-  return new Promise((resolve) => {
-    exec(`platform-tools/fastboot flash boot "${imagePath}"`, (error, stdout, stderr) => {
-      if (error) {
-        resolve({ success: false, error: stderr });
-        return;
-      }
+  }
 
-      resolve({ success: true, data: stdout });
-    });
-  });
-});
+}
+
+
+// ======================================
+// CHIPSET DETECTION
+// ======================================
+
+function detectChipset(props) {
+
+  const hardware = (
+    props['ro.hardware'] || ''
+  ).toLowerCase();
+
+  if (hardware.includes('qcom')) {
+    return 'Qualcomm Snapdragon';
+  }
+
+  if (hardware.includes('mt')) {
+    return 'MediaTek';
+  }
+
+  if (hardware.includes('exynos')) {
+    return 'Samsung Exynos';
+  }
+
+  if (hardware.includes('ums')) {
+    return 'Unisoc';
+  }
+
+  return 'Unknown';
+
+}

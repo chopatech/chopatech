@@ -40,6 +40,63 @@ background:#27272a;
 border-radius:20px;
 }
 
+.device-panel {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.device-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card label {
+  display: block;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.card h3 {
+  color: white;
+  font-size: 18px;
+}
+
+.badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.connected {
+  background: rgba(34,197,94,0.2);
+  color: #22c55e;
+}
+
+.disconnected {
+  background: rgba(239,68,68,0.2);
+  color: #ef4444;
+}
+
 .sidebar{
 width:280px;
 background:#111114;
@@ -352,6 +409,51 @@ Toggle Theme
 </button>
 </div>
 </header>
+
+<div class="device-panel">
+
+  <div class="device-header">
+    <h2>Device Detection</h2>
+    <span id="connectionBadge" class="badge disconnected">
+      Disconnected
+    </span>
+  </div>
+
+  <div class="device-grid">
+
+    <div class="card">
+      <label>Device Model</label>
+      <h3 id="deviceModel">No Device</h3>
+    </div>
+
+    <div class="card">
+      <label>Brand</label>
+      <h3 id="deviceBrand">-</h3>
+    </div>
+
+    <div class="card">
+      <label>Android Version</label>
+      <h3 id="androidVersion">-</h3>
+    </div>
+
+    <div class="card">
+      <label>Chipset</label>
+      <h3 id="chipset">-</h3>
+    </div>
+
+    <div class="card">
+      <label>Mode</label>
+      <h3 id="deviceMode">-</h3>
+    </div>
+
+    <div class="card">
+      <label>Battery</label>
+      <h3 id="batteryLevel">-</h3>
+    </div>
+
+  </div>
+
+</div>
 
 <!-- CONTENT -->
 <div class="content">
