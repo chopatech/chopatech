@@ -28,7 +28,6 @@
     }
   },
   "dependencies": {
-    "adbkit": "^2.0.17",
-    "usb-detection": "^4.14.2"
+    "adbkit": "^2.11.1"
   }
 }

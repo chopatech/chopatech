@@ -1,156 +1,108 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const adb = require('adbkit');
-const usbDetect = require('usb-detection');
 
 const client = adb.createClient();
 
-let mainWindow;
-
 function createWindow() {
 
-  mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 950,
-
-    icon: path.join(__dirname, 'assets/icon.ico'),
-
-    backgroundColor: '#09090b',
-    autoHideMenuBar: true,
+  const win = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    backgroundColor: '#0b1020',
 
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
-      contextIsolation: true
+      nodeIntegration: true,
+      contextIsolation: false
     }
   });
 
-  mainWindow.loadFile('renderer/index.html');
+  win.loadFile('renderer/index.html');
 }
 
+app.whenReady().then(createWindow);
 
-app.whenReady().then(() => {
-
-  createWindow();
-
-  // Start USB Monitoring
-  usbDetect.startMonitoring();
-
-  // USB Connected
-  usbDetect.on('add', async () => {
-    sendDeviceUpdate();
-  });
-
-  // USB Disconnected
-  usbDetect.on('remove', async () => {
-    sendDeviceUpdate();
-  });
-
-  // Auto Refresh Every 4 Seconds
-  setInterval(() => {
-    sendDeviceUpdate();
-  }, 4000);
-
-});
-
-
-app.on('window-all-closed', () => {
-
-  usbDetect.stopMonitoring();
-
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-
-});
-
-
-// ======================================
-// DEVICE DETECTION FUNCTION
-// ======================================
-
-async function sendDeviceUpdate() {
+ipcMain.handle('detect-phone', async () => {
 
   try {
 
     const devices = await client.listDevices();
 
-    // No Device Connected
     if (devices.length === 0) {
-
-      mainWindow.webContents.send('device-status', {
-        connected: false
-      });
-
-      return;
+      return [];
     }
 
-    // First Connected Device
-    const device = devices[0];
+    const result = [];
 
-    // Get Device Properties
-    const model = await client.getProperties(device.id);
+    for (const device of devices) {
 
-    mainWindow.webContents.send('device-status', {
+      const id = device.id;
 
-      connected: true,
+      async function getProp(prop) {
 
-      id: device.id,
+        try {
 
-      model: model['ro.product.model'],
+          const output = await client.shell(id, `getprop ${prop}`);
 
-      brand: model['ro.product.brand'],
+          const adbkit = require('adbkit');
+          const value = await adbkit.util.readAll(output);
 
-      android: model['ro.build.version.release'],
+          return value.toString().trim();
 
-      chipset: detectChipset(model),
+        } catch {
 
-      mode: 'ADB',
+          return 'Unknown';
 
-      battery: Math.floor(Math.random() * 40) + 60,
+        }
 
-      storage: '128GB'
+      }
 
-    });
+      async function getBattery() {
+
+        try {
+
+          const output = await client.shell(id, 'dumpsys battery');
+
+          const adbkit = require('adbkit');
+          const value = await adbkit.util.readAll(output);
+
+          const text = value.toString();
+
+          const match = text.match(/level: (\d+)/);
+
+          return match ? match[1] + '%' : 'Unknown';
+
+        } catch {
+
+          return 'Unknown';
+
+        }
+
+      }
+
+      result.push({
+
+        id,
+        model: await getProp('ro.product.model'),
+        brand: await getProp('ro.product.brand'),
+        android: await getProp('ro.build.version.release'),
+        manufacturer: await getProp('ro.product.manufacturer'),
+        serial: await getProp('ro.serialno'),
+        cpu: await getProp('ro.product.cpu.abi'),
+        battery: await getBattery(),
+        state: device.type
+
+      });
+
+    }
+
+    return result;
 
   } catch (err) {
 
-    mainWindow.webContents.send('device-status', {
-      connected: false,
+    return {
       error: err.message
-    });
+    };
 
   }
 
-}
-
-
-// ======================================
-// CHIPSET DETECTION
-// ======================================
-
-function detectChipset(props) {
-
-  const hardware = (
-    props['ro.hardware'] || ''
-  ).toLowerCase();
-
-  if (hardware.includes('qcom')) {
-    return 'Qualcomm Snapdragon';
-  }
-
-  if (hardware.includes('mt')) {
-    return 'MediaTek';
-  }
-
-  if (hardware.includes('exynos')) {
-    return 'Samsung Exynos';
-  }
-
-  if (hardware.includes('ums')) {
-    return 'Unisoc';
-  }
-
-  return 'Unknown';
-
-}
+});

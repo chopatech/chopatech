@@ -402,11 +402,13 @@ M
 </div>
 
 <div class="flex items-center gap-4">
-<div class="tag green">Connected</div>
-<div class="tag blue">Fastboot Mode</div>
-<button onclick="toggleTheme()" class="px-5 py-3 rounded-xl border border-zinc-700">
-Toggle Theme
-</button>
+  <div class="tag green">Connected</div>
+  <div class="tag blue">Fastboot Mode</div>
+  <button id="scanBtn" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">Start Scan</button>
+  <div id="statusText" class="text-sm text-zinc-400 ml-2"></div>
+  <button onclick="toggleTheme()" class="px-5 py-3 rounded-xl border border-zinc-700">
+    Toggle Theme
+  </button>
 </div>
 </header>
 
