@@ -16,7 +16,9 @@ function createWindow() {
     }
   });
 
-  win.loadFile('renderer/index.html');
+  win.loadFile('render/index.html');
+
+  win.webContents.openDevTools();
 }
 
 app.whenReady().then(createWindow);
@@ -35,62 +37,16 @@ ipcMain.handle('detect-phone', async () => {
 
     for (const device of devices) {
 
-      const id = device.id;
-
-      async function getProp(prop) {
-
-        try {
-
-          const output = await client.shell(id, `getprop ${prop}`);
-
-          const adbkit = require('adbkit');
-          const value = await adbkit.util.readAll(output);
-
-          return value.toString().trim();
-
-        } catch {
-
-          return 'Unknown';
-
-        }
-
-      }
-
-      async function getBattery() {
-
-        try {
-
-          const output = await client.shell(id, 'dumpsys battery');
-
-          const adbkit = require('adbkit');
-          const value = await adbkit.util.readAll(output);
-
-          const text = value.toString();
-
-          const match = text.match(/level: (\d+)/);
-
-          return match ? match[1] + '%' : 'Unknown';
-
-        } catch {
-
-          return 'Unknown';
-
-        }
-
-      }
-
       result.push({
-
-        id,
-        model: await getProp('ro.product.model'),
-        brand: await getProp('ro.product.brand'),
-        android: await getProp('ro.build.version.release'),
-        manufacturer: await getProp('ro.product.manufacturer'),
-        serial: await getProp('ro.serialno'),
-        cpu: await getProp('ro.product.cpu.abi'),
-        battery: await getBattery(),
+        id: device.id,
+        model: 'Android Device',
+        brand: 'Connected',
+        manufacturer: 'ADB',
+        android: 'Detected',
+        battery: 'Unknown',
+        cpu: 'Unknown',
+        serial: device.id,
         state: device.type
-
       });
 
     }

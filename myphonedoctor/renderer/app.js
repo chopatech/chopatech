@@ -1,48 +1,65 @@
-const terminal = document.querySelector('.terminal');
+const { ipcRenderer } = require('electron');
 
-function addLog(message, type = 'green') {
-  const line = document.createElement('div');
-  line.className = `log-${type}`;
-  line.innerText = message;
+const scanBtn = document.getElementById('scanBtn');
+const statusText = document.getElementById('statusText');
 
-  terminal.appendChild(line);
-  terminal.scrollTop = terminal.scrollHeight;
-}
+scanBtn.addEventListener('click', async () => {
 
-async function detectADB() {
-  addLog('[ADB] Searching for devices...', 'blue');
+  statusText.innerHTML = 'Scanning devices...';
 
-  const result = await window.androidAPI.adbDevices();
+  try {
 
-  if (result.success) {
-    addLog(result.data, 'green');
-  } else {
-    addLog(result.error, 'red');
+    const devices = await ipcRenderer.invoke('detect-phone');
+
+    if (devices.error) {
+
+      statusText.innerHTML = devices.error;
+      return;
+    }
+
+    if (devices.length === 0) {
+
+      statusText.innerHTML = 'No Android device connected.';
+      return;
+    }
+
+    let html = '';
+
+    devices.forEach(device => {
+
+      html += `
+
+      <div class="device-card">
+
+        <h2>${device.model}</h2>
+
+        <p><strong>Brand:</strong> ${device.brand}</p>
+
+        <p><strong>Manufacturer:</strong> ${device.manufacturer}</p>
+
+        <p><strong>Android:</strong> ${device.android}</p>
+
+        <p><strong>Battery:</strong> ${device.battery}</p>
+
+        <p><strong>CPU:</strong> ${device.cpu}</p>
+
+        <p><strong>Serial:</strong> ${device.serial}</p>
+
+        <p><strong>State:</strong> ${device.state}</p>
+
+        <p><strong>Device ID:</strong> ${device.id}</p>
+
+      </div>
+
+      `;
+    });
+
+    statusText.innerHTML = html;
+
+  } catch (err) {
+
+    statusText.innerHTML = err.message;
+
   }
-}
 
-async function detectFastboot() {
-  addLog('[FASTBOOT] Searching for devices...', 'blue');
-
-  const result = await window.androidAPI.fastbootDevices();
-
-  if (result.success) {
-    addLog(result.data, 'green');
-  } else {
-    addLog(result.error, 'red');
-  }
-}
-
-async function flashBootImage() {
-  const imagePath = 'firmware/boot.img';
-
-  addLog('[FLASH] Flashing boot image...', 'amber');
-
-  const result = await window.androidAPI.flashBoot(imagePath);
-
-  if (result.success) {
-    addLog(result.data, 'green');
-  } else {
-    addLog(result.error, 'red');
-  }
-}
+});
